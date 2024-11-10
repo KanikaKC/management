@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ExpenseService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.finance.expense.service</a>
+</div>
+
+<h1>Coverage Summary for Class: ExpenseService (com.finance.expense.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExpenseService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.finance.expense.service;
+&nbsp;
+&nbsp;import com.finance.expense.dto.ExpenseCategory;
+&nbsp;import com.finance.expense.dto.ExpenseDto;
+&nbsp;import com.finance.expense.dto.IncomeDto;
+&nbsp;import com.finance.expense.entity.ExpenseEntity;
+&nbsp;import com.finance.expense.repository.ExpenseRepository;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.web.multipart.MultipartFile;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;@Service
+<b class="nc">&nbsp;public class ExpenseService {</b>
+&nbsp;    @Autowired
+&nbsp;    private ExpenseRepository expenseRepository;
+&nbsp;
+&nbsp;
+&nbsp;    public ExpenseEntity addIncome(IncomeDto incomeDto, String userEmail) {
+&nbsp;
+<b class="nc">&nbsp;        BigDecimal sum = incomeDto.getSum();</b>
+<b class="nc">&nbsp;        if (sum.compareTo(BigDecimal.ZERO) &lt;= 0) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Income sum must be a positive value.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        ExpenseEntity income = new ExpenseEntity();</b>
+<b class="nc">&nbsp;        income.setPurpose(incomeDto.getPurpose());</b>
+<b class="nc">&nbsp;        income.setCategory(ExpenseCategory.REVENUE);</b>
+<b class="nc">&nbsp;        income.setSum(sum);</b>
+<b class="nc">&nbsp;        income.setEmailId(userEmail);</b>
+<b class="nc">&nbsp;        income.setDate(incomeDto.getDate());</b>
+<b class="nc">&nbsp;        return expenseRepository.save(income);</b>
+&nbsp;    }
+&nbsp;    public ExpenseEntity addExpenditure(String purpose, BigDecimal sum, LocalDate date, String category, MultipartFile billsImage, String userEmail) {
+<b class="nc">&nbsp;        BigDecimal totalBalance = getTotalBalance(userEmail);</b>
+<b class="nc">&nbsp;        if (totalBalance.add(sum.negate()).compareTo(BigDecimal.ZERO) &lt; 0) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Insufficient balance to add this expenditure&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (sum.compareTo(BigDecimal.ZERO) &lt;= 0) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Expense sum must be a positive value.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String imagePath = null;</b>
+<b class="nc">&nbsp;        if (billsImage != null &amp;&amp; !billsImage.isEmpty()) {</b>
+<b class="nc">&nbsp;            imagePath = saveImage(billsImage);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ExpenseEntity expense = new ExpenseEntity();</b>
+<b class="nc">&nbsp;        expense.setPurpose(purpose);</b>
+<b class="nc">&nbsp;        expense.setEmailId(userEmail);</b>
+<b class="nc">&nbsp;        expense.setCategory(ExpenseCategory.valueOf(category));</b>
+<b class="nc">&nbsp;        expense.setSum(sum.negate());</b>
+<b class="nc">&nbsp;        expense.setDate(date);</b>
+<b class="nc">&nbsp;        expense.setBillsImage(imagePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        return expenseRepository.save(expense);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String saveImage(MultipartFile file) {
+<b class="nc">&nbsp;        String folder = &quot;/C:/Users/kzo1kor/Desktop/Image/Bills&quot;;</b>
+<b class="nc">&nbsp;        String fileName = System.currentTimeMillis() + &quot;_&quot; + file.getOriginalFilename();</b>
+<b class="nc">&nbsp;        File destinationFile = new File(folder + File.separator + fileName);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            file.transferTo(destinationFile); // Save the file</b>
+<b class="nc">&nbsp;            return &quot;/uploads/&quot; + fileName; // Return the relative path</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Failed to store file &quot; + fileName, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    public BigDecimal getTotalIncome(String userEmail) {
+<b class="nc">&nbsp;        return expenseRepository.findAll().stream()</b>
+<b class="nc">&nbsp;                .filter(entry -&gt; entry.getSum().compareTo(BigDecimal.ZERO) &gt; 0)</b>
+<b class="nc">&nbsp;                .map(ExpenseEntity::getSum)</b>
+<b class="nc">&nbsp;                .reduce(BigDecimal.ZERO, BigDecimal::add);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BigDecimal getTotalExpenditure(String userEmail) {
+<b class="nc">&nbsp;        return expenseRepository.findAll().stream()</b>
+<b class="nc">&nbsp;                .filter(entry -&gt; entry.getSum().compareTo(BigDecimal.ZERO) &lt; 0)</b>
+<b class="nc">&nbsp;                .map(ExpenseEntity::getSum)</b>
+<b class="nc">&nbsp;                .reduce(BigDecimal.ZERO, BigDecimal::add);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BigDecimal getTotalBalance(String userEmail) {
+<b class="nc">&nbsp;        BigDecimal totalIncome = getTotalIncome(userEmail);</b>
+<b class="nc">&nbsp;        BigDecimal totalExpenditure = getTotalExpenditure(userEmail);</b>
+<b class="nc">&nbsp;        return totalIncome.add(totalExpenditure);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ExpenseEntity&gt; getAllTransactions(String userEmail) {
+<b class="nc">&nbsp;        if (userEmail == null || userEmail.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;User email must not be null or empty&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return expenseRepository.findAll().stream()</b>
+<b class="nc">&nbsp;                .filter(expense -&gt; expense.getEmailId().equals(userEmail))</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void deleteTransactions(Long id) {
+&nbsp;
+<b class="nc">&nbsp;        expenseRepository.deleteById(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ExpenseEntity updateExpense(Long id, ExpenseDto expenseDto, String userEmail) {
+<b class="nc">&nbsp;        Optional&lt;ExpenseEntity&gt; optionalExpense = expenseRepository.findById(id);</b>
+<b class="nc">&nbsp;        if (!optionalExpense.isPresent()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Expense not found&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ExpenseEntity expense = optionalExpense.get();</b>
+&nbsp;        
+<b class="nc">&nbsp;        expense.setPurpose(expenseDto.getPurpose());</b>
+<b class="nc">&nbsp;        expense.setCategory(ExpenseCategory.valueOf(expenseDto.getCategory()));</b>
+<b class="nc">&nbsp;        expense.setSum(expenseDto.getSum());</b>
+<b class="nc">&nbsp;        expense.setDate(expenseDto.getDate());</b>
+&nbsp;        
+<b class="nc">&nbsp;        return expenseRepository.save(expense);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-29 15:26</div>
+</div>
+</body>
+</html>

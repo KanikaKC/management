@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JwtService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.finance.login.service</a>
+</div>
+
+<h1>Coverage Summary for Class: JwtService (com.finance.login.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JwtService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (4/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.finance.login.service;
+&nbsp;
+&nbsp;import io.jsonwebtoken.Claims;
+&nbsp;import io.jsonwebtoken.JwtException;
+&nbsp;import io.jsonwebtoken.Jwts;
+&nbsp;import io.jsonwebtoken.SignatureAlgorithm;
+&nbsp;import io.jsonwebtoken.io.Decoders;
+&nbsp;import io.jsonwebtoken.security.Keys;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;
+&nbsp;import java.security.Key;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;@Component
+<b class="fc">&nbsp;public class JwtService {</b>
+<b class="fc">&nbsp;    private String SECRET_KEY = &quot;d30088c7eba64217040fb39f5dab270124004cc403e75c088eae575214afa7dd&quot;;</b>
+<b class="fc">&nbsp;    private long VALIDITY = 1000 * 60 * 6;</b>
+<b class="fc">&nbsp;    private long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 6;</b>
+&nbsp;
+&nbsp;    public String generateToken(String emailId) {
+<b class="nc">&nbsp;        Map&lt;String, Object&gt; claims = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        return createToken(claims, emailId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String createToken(Map&lt;String, Object&gt; claims, String emailId) {
+&nbsp;        try {
+<b class="nc">&nbsp;        return Jwts.builder()</b>
+<b class="nc">&nbsp;                .setClaims(claims)</b>
+<b class="nc">&nbsp;                .setSubject(emailId)</b>
+<b class="nc">&nbsp;                .setIssuedAt(new Date(System.currentTimeMillis()))</b>
+<b class="nc">&nbsp;                .setExpiration(new Date(System.currentTimeMillis() + VALIDITY))</b>
+<b class="nc">&nbsp;                .signWith(getSignKey(), SignatureAlgorithm.HS256)</b>
+<b class="nc">&nbsp;                .compact();</b>
+<b class="nc">&nbsp;    } catch (JwtException e) {</b>
+<b class="nc">&nbsp;            return &quot;Invalid token&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean validateToken(String token, String userEmail) {
+&nbsp;        try {
+<b class="nc">&nbsp;            String extractedEmail = extractUsername(token);</b>
+<b class="nc">&nbsp;            return (extractedEmail.equals(userEmail) &amp;&amp; !isTokenExpired(token));</b>
+<b class="nc">&nbsp;        } catch (JwtException | IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String extractUsername(String token) {
+<b class="nc">&nbsp;        return extractAllClaims(token).getSubject();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Claims extractAllClaims(String token) {
+<b class="nc">&nbsp;        return Jwts.parser()</b>
+<b class="nc">&nbsp;                .setSigningKey(getSignKey())</b>
+<b class="nc">&nbsp;                .build()</b>
+<b class="nc">&nbsp;                .parseClaimsJws(token)</b>
+<b class="nc">&nbsp;                .getBody();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean isTokenExpired(String token) {
+<b class="nc">&nbsp;        return extractAllClaims(token).getExpiration().before(new Date());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    private Key getSignKey() {
+<b class="nc">&nbsp;        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);</b>
+<b class="nc">&nbsp;        return Keys.hmacShaKeyFor(keyBytes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-29 15:26</div>
+</div>
+</body>
+</html>

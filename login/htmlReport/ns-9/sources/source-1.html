@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SecurityConfig</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.finance.login.config</a>
+</div>
+
+<h1>Coverage Summary for Class: SecurityConfig (com.finance.login.config)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SecurityConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.5%
+  </span>
+  <span class="absValue">
+    (19/21)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$0</td>
+  </tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$FastClass$$0</td>
+  </tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$FastClass$$1</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.5%
+  </span>
+  <span class="absValue">
+    (19/21)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.finance.login.config;
+&nbsp;
+&nbsp;
+&nbsp;import com.finance.login.service.JwtRequestFilterService;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.security.config.Customizer;
+&nbsp;import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+&nbsp;import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+&nbsp;import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+&nbsp;import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+&nbsp;import org.springframework.security.config.http.SessionCreationPolicy;
+&nbsp;import org.springframework.security.web.SecurityFilterChain;
+&nbsp;import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+&nbsp;
+&nbsp;@Configuration
+&nbsp;@EnableWebSecurity
+&nbsp;@EnableMethodSecurity
+<b class="fc">&nbsp;public class SecurityConfig {</b>
+&nbsp;    @Autowired
+&nbsp;    private JwtRequestFilterService jwtRequestFilterService;
+&nbsp;
+&nbsp;//    @Autowired
+&nbsp;//    private CustomUserDetails customUserDetails;
+&nbsp;//
+&nbsp;//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+&nbsp;//        auth.userDetailsService(customUserDetails);
+&nbsp;//    }
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+<b class="fc">&nbsp;        return http</b>
+<b class="fc">&nbsp;                .authorizeHttpRequests(registry -&gt; {</b>
+<b class="fc">&nbsp;                   registry.requestMatchers(&quot;/&quot;,&quot;/user/login&quot;,&quot;/**&quot;, &quot;/login&quot;, &quot;/oauth2/**&quot;).permitAll();</b>
+<b class="fc">&nbsp;                            registry.anyRequest().authenticated();</b>
+&nbsp;                        })
+<b class="fc">&nbsp;                .oauth2Login(oauth2Login -&gt; oauth2Login</b>
+<b class="fc">&nbsp;                        .successHandler((request, response, authentication) -&gt; {</b>
+&nbsp;                            // Debugging line
+<b class="nc">&nbsp;                            System.out.println(&quot;Login successful!&quot;);</b>
+<b class="nc">&nbsp;                            response.sendRedirect(&quot;http://localhost:8000/loginSuccess&quot;);</b>
+&nbsp;                        })
+<b class="fc">&nbsp;                        .failureUrl(&quot;/loginFailure&quot;)</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .logout(logout -&gt; logout</b>
+<b class="fc">&nbsp;                        .logoutUrl(&quot;/api/logout&quot;)</b>
+<b class="fc">&nbsp;                        .invalidateHttpSession(true)</b>
+<b class="fc">&nbsp;                        .clearAuthentication(true)</b>
+<b class="fc">&nbsp;                        .logoutSuccessUrl(&quot;http://localhost:3000/&quot;)</b>
+<b class="fc">&nbsp;                        .permitAll()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .csrf(AbstractHttpConfigurer::disable)</b>
+<b class="fc">&nbsp;                .sessionManagement(session -&gt; session</b>
+<b class="fc">&nbsp;                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // adjust based on your needs</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .addFilterBefore(jwtRequestFilterService, UsernamePasswordAuthenticationFilter.class)</b>
+<b class="fc">&nbsp;                .build();</b>
+&nbsp;
+&nbsp;//
+&nbsp;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-29 15:26</div>
+</div>
+</body>
+</html>

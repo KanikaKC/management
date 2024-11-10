@@ -1,0 +1,16 @@
+#spring:
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          github:
+#            client-id: Ov23li55mKcR9Elv3kYG
+#            client-secret: 937eb75d944076cabe027260b2558c1de39abbdc
+##           redirect-uri: "http://localhost:8080/secured"
+#            scope: read:user
+#
+#    logging:
+#      level:
+#        org.springframework.web.client.RestTemplate: DEBUG
+#
+#

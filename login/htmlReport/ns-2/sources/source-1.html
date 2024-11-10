@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ExpenseController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.finance.expense.Controller</a>
+</div>
+
+<h1>Coverage Summary for Class: ExpenseController (com.finance.expense.Controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExpenseController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.finance.expense.Controller;
+&nbsp;
+&nbsp;import com.finance.expense.dto.ApiResponseDto;
+&nbsp;import com.finance.expense.dto.ExpenseDto;
+&nbsp;import com.finance.expense.dto.IncomeDto;
+&nbsp;import com.finance.expense.dto.TransactionDto;
+&nbsp;import com.finance.expense.entity.ExpenseEntity;
+&nbsp;import com.finance.expense.service.ExpenseService;
+&nbsp;import org.apache.poi.ss.usermodel.RichTextString;
+&nbsp;import org.apache.poi.ss.usermodel.Row;
+&nbsp;import org.apache.poi.ss.usermodel.Sheet;
+&nbsp;import org.apache.poi.ss.usermodel.Workbook;
+&nbsp;import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.HttpHeaders;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;import org.springframework.web.multipart.MultipartFile;
+&nbsp;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@CrossOrigin(origins = &quot;http://localhost:3000&quot;)
+&nbsp;@RestController
+<b class="nc">&nbsp;public class ExpenseController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private ExpenseService expenseService;
+&nbsp;
+&nbsp;    @PostMapping(&quot;/expenses&quot;)
+&nbsp;    public ResponseEntity&lt;ApiResponseDto&lt;ExpenseEntity&gt;&gt; addExpense(
+&nbsp;            @RequestParam(&quot;purpose&quot;) String purpose,
+&nbsp;            @RequestParam(&quot;sum&quot;) BigDecimal sum,
+&nbsp;            @RequestParam(&quot;date&quot;) LocalDate date,
+&nbsp;            @RequestParam(&quot;category&quot;) String category,
+&nbsp;            @RequestParam(value = &quot;billsImage&quot;, required = false) MultipartFile billsImage,
+&nbsp;            @RequestHeader(&quot;User-Email&quot;) String userEmail) {
+&nbsp;        try {
+<b class="nc">&nbsp;            ExpenseEntity expense = expenseService.addExpenditure(purpose, sum, date, category, billsImage, userEmail);</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto&lt;&gt;(true, expense, null, HttpStatus.CREATED.value(), null));</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(new ApiResponseDto&lt;&gt;(false, null, e.getMessage(), HttpStatus.BAD_REQUEST.value(), null));</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto&lt;&gt;(false, null, &quot;An unexpected error occurred.&quot;, HttpStatus.INTERNAL_SERVER_ERROR.value(), null));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;/income&quot;)
+&nbsp;    public ResponseEntity&lt;ApiResponseDto&lt;ExpenseEntity&gt;&gt; addIncome(@RequestBody IncomeDto incomeDto, @RequestHeader(&quot;User-Email&quot;) String userEmail) {
+&nbsp;        try {
+<b class="nc">&nbsp;            ExpenseEntity income = expenseService.addIncome(incomeDto, userEmail);</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDto&lt;&gt;(true, income, null, HttpStatus.CREATED.value(),null));</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(new ApiResponseDto&lt;&gt;(false, null, e.getMessage(), HttpStatus.BAD_REQUEST.value(),null));</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto&lt;&gt;(false, null, &quot;An unexpected error occurred.&quot;, HttpStatus.INTERNAL_SERVER_ERROR.value(),null));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/transactions&quot;)
+&nbsp;    public ResponseEntity&lt;ApiResponseDto&lt;List&lt;ExpenseEntity&gt;&gt;&gt; getAllTransactions(@RequestParam String userEmail) {
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;ExpenseEntity&gt; transactions = expenseService.getAllTransactions(userEmail);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(new ApiResponseDto&lt;&gt;(true, transactions, null, HttpStatus.OK.value(), null));</b>
+&nbsp;
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(new ApiResponseDto&lt;&gt;(false, null, e.getMessage(), HttpStatus.BAD_REQUEST.value(),null));</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto&lt;&gt;(false, null, &quot;An unexpected error occurred.&quot;, HttpStatus.INTERNAL_SERVER_ERROR.value(),null));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    @GetMapping(&quot;/balance&quot;)
+&nbsp;    public ResponseEntity&lt;BigDecimal&gt; getCurrentBalance(@RequestParam String userEmail) {
+<b class="nc">&nbsp;        BigDecimal balance = expenseService.getTotalBalance(userEmail);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(balance);</b>
+&nbsp;    }
+&nbsp;    @GetMapping(&quot;/export-transactions&quot;)
+&nbsp;    public ResponseEntity&lt;byte[]&gt; exportTransactions(@RequestParam String userEmail) {
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;ExpenseEntity&gt; transactions = expenseService.getAllTransactions(userEmail);</b>
+&nbsp;
+<b class="nc">&nbsp;            Workbook workbook = new XSSFWorkbook();</b>
+<b class="nc">&nbsp;            Sheet sheet = workbook.createSheet(&quot;Transactions&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            Row header = sheet.createRow(0);</b>
+<b class="nc">&nbsp;            header.createCell(0).setCellValue(&quot;Purpose&quot;);</b>
+<b class="nc">&nbsp;            header.createCell(1).setCellValue(&quot;Category&quot;);</b>
+<b class="nc">&nbsp;            header.createCell(2).setCellValue(&quot;Amount&quot;);</b>
+<b class="nc">&nbsp;            header.createCell(3).setCellValue(&quot;Date&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (int i = 0; i &lt; transactions.size(); i++) {</b>
+<b class="nc">&nbsp;                ExpenseEntity transaction = transactions.get(i);</b>
+<b class="nc">&nbsp;                Row row = sheet.createRow(i + 1);</b>
+<b class="nc">&nbsp;                row.createCell(0).setCellValue(transaction.getPurpose());</b>
+<b class="nc">&nbsp;                row.createCell(1).setCellValue(transaction.getCategory().ordinal());</b>
+<b class="nc">&nbsp;                row.createCell(2).setCellValue(transaction.getSum().doubleValue());</b>
+<b class="nc">&nbsp;                row.createCell(3).setCellValue(transaction.getDate().toString());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;            workbook.write(outputStream);</b>
+<b class="nc">&nbsp;            workbook.close();</b>
+&nbsp;
+<b class="nc">&nbsp;            byte[] excelFile = outputStream.toByteArray();</b>
+<b class="nc">&nbsp;            HttpHeaders headers = new HttpHeaders();</b>
+<b class="nc">&nbsp;            headers.add(&quot;Content-Disposition&quot;, &quot;attachment; filename=transactions.xlsx&quot;);</b>
+<b class="nc">&nbsp;            return new ResponseEntity&lt;&gt;(excelFile, headers, HttpStatus.OK);</b>
+&nbsp;
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</b>
+<b class="nc">&nbsp;                    .body(null);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/delete-transaction&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; deleteTransaction(@RequestParam Long id) {
+&nbsp;        try {
+<b class="nc">&nbsp;            expenseService.deleteTransactions(id);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(&quot;Transaction deleted successfully.&quot;);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(500).body(&quot;Failed to delete transaction: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/update-transaction/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;ApiResponseDto&lt;ExpenseEntity&gt;&gt; updateTransaction(@PathVariable Long id,
+&nbsp;                                                                            @RequestBody ExpenseDto expenseDto, @RequestHeader(&quot;User-Email&quot;) String userEmail) {
+&nbsp;        try {
+<b class="nc">&nbsp;            ExpenseEntity updatedTransaction = expenseService.updateExpense(id, expenseDto, userEmail);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(new ApiResponseDto&lt;&gt;(true, updatedTransaction, null, HttpStatus.OK.value(), null));</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(new ApiResponseDto&lt;&gt;(false, null, e.getMessage(), HttpStatus.BAD_REQUEST.value(), null));</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto&lt;&gt;(false, null, &quot;An unexpected error occurred.&quot;, HttpStatus.INTERNAL_SERVER_ERROR.value(), null));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-29 15:26</div>
+</div>
+</body>
+</html>
